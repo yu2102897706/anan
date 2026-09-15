@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>随安数</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #ffffff;
+            font-family: 'Georgia', 'Times New Roman', '宋体', serif;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #000000;
+        }
+
+        /* 开屏动画 */
+        .splash {
+            position: fixed;
+            inset: 0;
+            background: #1a1208;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.9s ease-out;
+            padding: 40px;
+        }
+        .splash.hide { opacity: 0; pointer-events: none; }
+        .splash-text {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-size: 26px;
+            letter-spacing: 8px;
+            line-height: 2.2;
+            color: #e8d4a0;
+            font-family: 'KaiTi', '楷体', 'STKaiti', serif;
+            text-shadow: 0 0 24px rgba(232, 212, 160, 0.35);
+            max-height: 80vh;
+        }
+
+        .container {
+            max-width: 880px;
+            width: 100%;
+            border: 1px solid #000000;
+            padding: 18px 20px 20px;
+            background: #ffffff;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .title { font-size: 28px; font-weight: 700; letter-spacing: 5px; }
+        .subtitle { font-size: 12px; letter-spacing: 3px; color: #444444; margin-top: 2px; }
+
+        .input-section {
+            border: 1px solid #cccccc;
+            padding: 10px 14px 12px;
+            margin-bottom: 16px;
+            background: #f9f9f9;
+        }
+
+        .calendar-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 3px 5px;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #cccccc;
+            font-size: 13px;
+        }
+
+        .calendar-row select {
+            padding: 2px 2px;
+            font-size: 13px;
+            border: 1px solid #aaaaaa;
+            background: #ffffff;
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .calendar-row label { font-size: 13px; font-weight: 600; }
+
+        .btn-wnl, .btn-import, .btn-clear {
+            color: #ffffff;
+            border: 1px solid;
+            padding: 3px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+            margin-left: 4px;
+        }
+        .btn-wnl { background: #444444; border-color: #444444; }
+        .btn-wnl:hover { background: #222222; }
+        .btn-import { background: #2a5a3a; border-color: #2a5a3a; }
+        .btn-import:hover { background: #1e4229; }
+        .btn-clear { background: #8a2a2a; border-color: #8a2a2a; }
+        .btn-clear:hover { background: #6a1e1e; }
+
+        .pillar-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 6px;
+            margin-bottom: 8px;
+        }
+
+        .pillar-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            border: 1px solid #aaaaaa;
+            padding: 2px 6px 2px 5px;
+            background: #ffffff;
+        }
+
+        .pillar-group label { font-size: 13px; font-weight: 600; margin-right: 1px; }
+
+        .pillar-group select {
+            padding: 2px 2px;
+            font-size: 13px;
+            border: 1px solid #aaaaaa;
+            background: #ffffff;
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+            min-width: 38px;
+        }
+
+        .bazi-display {
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            padding: 4px 0 6px;
+            letter-spacing: 1px;
+        }
+
+        .bazi-display span {
+            border: 1px solid #aaaaaa;
+            padding: 0 14px;
+            line-height: 32px;
+            display: inline-block;
+            min-width: 70px;
+            background: #ffffff;
+        }
+
+        .name-input-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 4px 8px;
+            margin-top: 4px;
+        }
+
+        .name-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            border: 1px solid #aaaaaa;
+            padding: 2px 6px 2px 5px;
+            background: #ffffff;
+        }
+
+        .name-group label { font-size: 13px; font-weight: 600; margin-right: 1px; }
+
+        .name-group input {
+            width: 48px;
+            padding: 2px 3px;
+            font-size: 14px;
+            border: 1px solid #aaaaaa;
+            background: #ffffff;
+            font-family: inherit;
+            text-align: center;
+            font-weight: 500;
+            outline: none;
+        }
+
+        .btn-random {
+            background: #666666;
+            color: #ffffff;
+            border: 1px solid #666666;
+            padding: 3px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+        .btn-random:hover { background: #444444; }
+
+        .stroke-result {
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid #aaaaaa;
+            padding: 0 14px;
+            line-height: 30px;
+            display: inline-block;
+            min-width: 50px;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .btn-calc, .btn-divine, .btn-copy {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+            padding: 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 3px;
+            transition: 0.1s;
+        }
+        .btn-calc { flex: 3; }
+        .btn-divine { flex: 1; }
+        .btn-copy { flex: 2; }
+        .btn-calc:hover, .btn-divine:hover, .btn-copy:hover { background: #333333; }
+        .btn-calc:active, .btn-divine:active, .btn-copy:active { transform: scale(0.98); }
+
+        .result-area { display: none; margin-top: 2px; }
+        .result-area.active { display: block; }
+
+        .jiangtian-box {
+            border: 1px solid #000000;
+            padding: 12px 16px;
+            text-align: center;
+            margin-bottom: 16px;
+            background: #f9f9f9;
+            position: relative;
+        }
+
+        .jiangtian-box .label { font-size: 14px; color: #222222; letter-spacing: 2px; }
+
+        .jiangtian-box .value {
+            font-size: 34px;
+            font-weight: 700;
+            margin: 0px 0;
+            letter-spacing: 4px;
+        }
+
+        .jiangtian-box .age-1 {
+            font-size: 15px;
+            font-weight: 500;
+            margin-top: 2px;
+            line-height: 1.7;
+        }
+
+        .verse {
+            font-size: 12px;
+            color: #6a5a4a;
+            font-style: italic;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+
+        .verse-inline {
+            display: block;
+            font-size: 11px;
+            color: #6a5a4a;
+            font-style: italic;
+            margin-top: 2px;
+            padding: 2px 4px;
+            border-left: 2px solid #cccccc;
+            text-align: left;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .jiangtian-box .divination-result {
+            display: none;
+            margin-top: 8px;
+            border: 1px solid #cccccc;
+            background: #fafafa;
+            cursor: pointer;
+            padding: 6px 10px;
+            text-align: center;
+        }
+
+        .divination-result .div-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .divination-result .div-header .main-combo {
+            font-size: 18px;
+            border: 1px solid #cccccc;
+            padding: 0 12px;
+            line-height: 30px;
+            background: #ffffff;
+        }
+
+        .divination-result .div-header .main-num {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000000;
+        }
+
+        .divination-result .derivatives-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            margin-top: 6px;
+            padding: 4px 2px;
+            border-top: 1px dashed #aaaaaa;
+            background: #f5f5f5;
+        }
+        .divination-result .derivatives-container.open { display: flex; }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid #000000;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            padding: 6px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid transparent;
+            border-bottom: none;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+            color: #444444;
+            background: #f0f0f0;
+            margin-right: 2px;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            border-color: #000000;
+            color: #000000;
+            border-bottom: 1px solid #ffffff;
+            margin-bottom: -1px;
+        }
+        .tab-btn:hover { background: #e0e0e0; }
+
+        .tab-content { display: none; padding: 4px 0 2px; }
+        .tab-content.active { display: block; }
+
+        .hidden { display: none !important; }
+
+        .age-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 4px 6px;
+            max-height: 460px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .age-grid::-webkit-scrollbar { width: 4px; }
+        .age-grid::-webkit-scrollbar-track { background: #f0f0f0; }
+        .age-grid::-webkit-scrollbar-thumb { background: #888888; }
+
+        .age-item {
+            border: 1px solid #cccccc;
+            padding: 4px 6px 4px 8px;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            background: #fafafa;
+            cursor: pointer;
+            transition: background 0.1s;
+            text-align: center;
+        }
+        .age-item:hover { background: #eaeaea; }
+
+        .age-item .age-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .age-item .age-num { font-weight: 600; color: #222222; font-size: 12px; }
+
+        .age-item .age-val {
+            font-weight: 700;
+            font-size: 14px;
+            border: 1px solid #cccccc;
+            padding: 0 8px;
+            line-height: 24px;
+            background: #ffffff;
+        }
+
+        .age-item .age-num-result {
+            font-weight: 700;
+            font-size: 14px;
+            color: #000000;
+            margin-left: 4px;
+        }
+
+        .age-item .derivatives-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            margin-top: 4px;
+            padding: 4px 2px;
+            border-top: 1px dashed #aaaaaa;
+            background: #f5f5f5;
+        }
+        .age-item .derivatives-container.open { display: flex; }
+
+        .deriv-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            padding: 2px 4px;
+            border-bottom: 1px dotted #cccccc;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+        }
+        .deriv-line:last-child { border-bottom: none; }
+
+        .deriv-combo { font-weight: 600; white-space: nowrap; }
+        .deriv-num { font-weight: 700; color: #000000; white-space: nowrap; }
+
+        .query-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            padding: 2px 0 6px;
+        }
+
+        .query-area label { font-size: 14px; font-weight: 500; }
+
+        .query-area input {
+            width: 80px;
+            padding: 4px 8px;
+            font-size: 15px;
+            border: 1px solid #aaaaaa;
+            background: #ffffff;
+            font-family: inherit;
+            text-align: center;
+            font-weight: 500;
+            outline: none;
+        }
+        .query-area input:focus { border-color: #000000; }
+
+        .query-area .btn-query {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+            padding: 4px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+        .query-area .btn-query:hover { background: #333333; }
+
+        .query-result {
+            margin-top: 10px;
+            padding: 10px 16px;
+            border: 1px solid #000000;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            background: #f9f9f9;
+        }
+
+        .query-result .highlight { font-size: 26px; }
+        .query-result .empty { color: #666666; font-weight: 400; font-size: 15px; }
+
+        .range-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            padding: 2px 0 6px;
+        }
+        .range-area label { font-size: 14px; font-weight: 500; }
+
+        .range-area input {
+            width: 68px;
+            padding: 4px 6px;
+            font-size: 15px;
+            border: 1px solid #aaaaaa;
+            background: #ffffff;
+            font-family: inherit;
+            text-align: center;
+            font-weight: 500;
+            outline: none;
+        }
+        .range-area input:focus { border-color: #000000; }
+
+        .range-area .btn-range {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+            padding: 4px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+        .range-area .btn-range:hover { background: #333333; }
+
+        .range-result {
+            margin-top: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .range-result::-webkit-scrollbar { width: 4px; }
+        .range-result::-webkit-scrollbar-track { background: #f0f0f0; }
+        .range-result::-webkit-scrollbar-thumb { background: #888888; }
+
+        .range-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 3px 8px;
+        }
+
+        .range-grid .age-item {
+            border: 1px solid #cccccc;
+            padding: 3px 4px 3px 8px;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            background: #fafafa;
+            cursor: default;
+        }
+        .range-grid .age-item .age-val {
+            border: 1px solid #cccccc;
+            padding: 0 8px;
+            line-height: 24px;
+            font-weight: 700;
+            font-size: 14px;
+            background: #ffffff;
+        }
+
+        .copy-hint {
+            text-align: center;
+            font-size: 11px;
+            color: #666666;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .copy-status {
+            text-align: center;
+            font-size: 12px;
+            color: #333333;
+            margin-top: 4px;
+            height: 16px;
+        }
+
+        .data-status {
+            text-align: center;
+            font-size: 12px;
+            color: #2a5a3a;
+            margin-top: 4px;
+            height: 16px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 14px 12px; }
+            .title { font-size: 22px; letter-spacing: 3px; }
+            .pillar-group { padding: 1px 4px; }
+            .pillar-group select { font-size: 12px; min-width: 34px; padding: 1px 1px; }
+            .name-group { padding: 1px 4px; }
+            .name-group input { width: 42px; font-size: 13px; }
+            .age-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+            .range-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+            .query-area { flex-direction: column; align-items: stretch; gap: 4px; }
+            .query-area input { width: 100%; }
+            .range-area { flex-direction: column; align-items: stretch; gap: 4px; }
+            .range-area input { width: 100%; }
+            .btn-row { flex-direction: column; }
+            .btn-calc, .btn-divine, .btn-copy { font-size: 14px; padding: 6px 0; flex: none; }
+            .jiangtian-box .value { font-size: 28px; }
+            .splash-text { font-size: 20px; letter-spacing: 6px; }
+        }
+
+        @media (max-width: 400px) {
+            .container { padding: 10px 8px; }
+            .title { font-size: 18px; letter-spacing: 2px; }
+            .age-item { font-size: 11px; padding: 3px 4px; }
+            .age-item .age-val { font-size: 12px; padding: 0 4px; line-height: 20px; }
+            .jiangtian-box .value { font-size: 22px; }
+            .pillar-group select { font-size: 11px; min-width: 30px; }
+            .divination-result .div-header .main-combo { font-size: 16px; padding: 0 8px; line-height: 26px; }
+            .deriv-line { font-size: 11px; }
+            .calendar-row { font-size: 12px; }
+            .calendar-row select { font-size: 12px; }
+            .splash-text { font-size: 16px; letter-spacing: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 开屏动画 -->
+<div class="splash" id="splash">
+    <div class="splash-text">
+        听天由命<br>由此心田<br>劳辱之事<br>与我何干<br>盈庭花草<br>满架诗篇<br>尽可消闲<br>随遇而安
+    </div>
+</div>
+
+<div class="container" id="app">
+
+    <div class="header">
+        <div class="title">随安数</div>
+        <div class="subtitle">— 岁运推演 —</div>
+    </div>
+
+    <div class="input-section">
+        <div class="calendar-row">
+            <label>公历</label>
+            <select id="wnl_year"></select>
+            <span>年</span>
+            <select id="wnl_month"></select>
+            <span>月</span>
+            <select id="wnl_day"></select>
+            <span>日</span>
+            <select id="wnl_hour"></select>
+            <button class="btn-wnl" id="wnlBtn">万年历填入</button>
+            <button class="btn-import" id="importBtn">导入命书</button>
+            <button class="btn-clear" id="clearBtn">清空条文</button>
+            <input type="file" id="fileInput" accept=".txt,.docx,.doc" style="display:none;" />
+        </div>
+        <div class="data-status" id="dataStatus"></div>
+
+        <div class="pillar-row" id="pillarRow">
+            <div class="pillar-group">
+                <label>年</label>
+                <select id="yearGan"></select>
+                <select id="yearZhi"></select>
+            </div>
+            <div class="pillar-group">
+                <label>月</label>
+                <select id="monthGan"></select>
+                <select id="monthZhi"></select>
+            </div>
+            <div class="pillar-group">
+                <label>日</label>
+                <select id="dayGan"></select>
+                <select id="dayZhi"></select>
+            </div>
+            <div class="pillar-group">
+                <label>时</label>
+                <select id="hourGan"></select>
+                <select id="hourZhi"></select>
+            </div>
+        </div>
+
+        <div class="bazi-display">
+            八字数 <span id="computedBaziDisplay">0</span>
+        </div>
+
+        <div class="name-input-row">
+            <div class="name-group">
+                <label>姓</label>
+                <input type="number" id="surnameStroke" min="0" step="1" value="7" />
+            </div>
+            <div class="name-group">
+                <label>中间</label>
+                <input type="number" id="middleStroke" min="0" step="1" value="0" />
+            </div>
+            <div class="name-group">
+                <label>末</label>
+                <input type="number" id="lastStroke" min="0" step="1" value="5" />
+            </div>
+            <button class="btn-random" id="randomBtn">随 机</button>
+            <span style="font-weight:500;">→</span>
+            <span class="stroke-result" id="computedStrokeDisplay">0</span>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-calc" id="calcBtn">推 演</button>
+            <button class="btn-divine" id="divineBtn">占 卜</button>
+            <button class="btn-copy" id="copyBtn">复制命书</button>
+        </div>
+        <div class="copy-status" id="copyStatus"></div>
+    </div>
+
+    <div class="result-area" id="resultArea">
+
+        <div class="jiangtian-box">
+            <div class="label">江天数</div>
+            <div class="value" id="jiangtianDisplay">—</div>
+            <div class="age-1" id="age1Display">1 岁 = —</div>
+            <div class="divination-result" id="divinationDisplay">
+                <div class="div-header">
+                    <span>占卜</span>
+                    <span class="main-combo" id="divMainCombo"></span>
+                    <span class="main-num" id="divMainNum"></span>
+                </div>
+                <div id="divMainVerse" style="font-size:13px;color:#6a5a4a;font-style:italic;margin-top:4px;"></div>
+                <div class="derivatives-container" id="divDerivContainer"></div>
+            </div>
+        </div>
+
+        <div class="tabs" id="tabsRow">
+            <button class="tab-btn active" data-tab="tabList">百岁列表</button>
+            <button class="tab-btn" data-tab="tabQuery">查询单岁</button>
+            <button class="tab-btn" data-tab="tabRange">查询范围</button>
+        </div>
+
+        <div class="tab-content active" id="tabList">
+            <div class="age-grid" id="ageGrid"></div>
+        </div>
+
+        <div class="tab-content" id="tabQuery">
+            <div class="query-area">
+                <label>年龄</label>
+                <input type="number" id="queryAge" min="1" step="1" value="36" />
+                <button class="btn-query" id="queryBtn">查询</button>
+            </div>
+            <div class="query-result" id="queryResult">
+                <span class="empty">输入年龄，点击查询</span>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tabRange">
+            <div class="range-area">
+                <label>从</label>
+                <input type="number" id="rangeStart" min="1" step="1" value="1" />
+                <label>到</label>
+                <input type="number" id="rangeEnd" min="1" step="1" value="20" />
+                <button class="btn-range" id="rangeBtn">查询</button>
+            </div>
+            <div class="range-result" id="rangeResult">
+                <div class="range-grid" id="rangeGrid"></div>
+            </div>
+        </div>
+
+        <div class="copy-hint">点击任意数值即可选中复制 · 导入命书后自动显示条文</div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+
+<script>
+const WNL = (function() {
+    const TG = "甲乙丙丁戊己庚辛壬癸".split("");
+    const DZ = "子丑寅卯辰巳午未申酉戌亥".split("");
+
+    function getDiZhiFromHour(hour) {
+        const map = {23:0,1:1,3:2,5:3,7:4,9:5,11:6,13:7,15:8,17:9,19:10,21:11};
+        return map[hour] ?? 0;
+    }
+
+    function getZiShiGanIndex(dayGanIndex) {
+        const rule = {0:0,1:2,2:4,3:6,4:8,5:0,6:2,7:4,8:6,9:8};
+        return rule[dayGanIndex];
+    }
+
+    function getShiZhu(dayGanZhi, hour) {
+        if (!dayGanZhi) return "??";
+        const dayGan = dayGanZhi[0];
+        const dayGanIdx = TG.indexOf(dayGan);
+        if (dayGanIdx === -1) return "??";
+        const ziGan = getZiShiGanIndex(dayGanIdx);
+        const shiZhi = getDiZhiFromHour(hour);
+        const shiGan = (ziGan + shiZhi) % 10;
+        return TG[shiGan] + DZ[shiZhi];
+    }
+
+    function getFourPillar(year, month, day, hour) {
+        if (typeof Lunar === 'undefined') {
+            console.warn('请先引入 lunar-javascript');
+            return ['甲子','丙子','甲子','甲子'];
+        }
+        const solar = Solar.fromYmdHms(year, month, day, hour, 0, 0);
+        const lunar = solar.getLunar();
+        const eightChar = lunar.getEightChar();
+        const yearGZ = eightChar.getYear();
+        const monthGZ = eightChar.getMonth();
+        const dayGZ = eightChar.getDay();
+        const hourGZ = getShiZhu(dayGZ, hour);
+        return [yearGZ, monthGZ, dayGZ, hourGZ];
+    }
+
+    return { getFourPillar };
+})();
+</script>
+
+<script>
+    (function() {
+        'use strict';
+
+        setTimeout(() => {
+            const splash = document.getElementById('splash');
+            if (splash) {
+                splash.classList.add('hide');
+                setTimeout(() => splash.remove(), 900);
+            }
+        }, 3000);
+
+        const GAN_MAP = {
+            '甲': 1, '乙': 2, '丙': 3, '丁': 4, '戊': 5,
+            '己': 6, '庚': 7, '辛': 8, '壬': 9, '癸': 10
+        };
+        const ZHI_MAP = {
+            '子': 1, '丑': 2, '寅': 3, '卯': 4, '辰': 5, '巳': 6,
+            '午': 7, '未': 8, '申': 9, '酉': 10, '戌': 11, '亥': 12
+        };
+        const GAN_LIST = Object.keys(GAN_MAP);
+        const ZHI_LIST = Object.keys(ZHI_MAP);
+        const ZHI_CHARS = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+        const TEN_MAP = {
+            '1': '贵', '2': '分', '3': '升', '4': '动', '5': '散',
+            '6': '沉', '7': '稳', '8': '贱', '9': '虚'
+        };
+        const ONE_MAP = {
+            '1': '官', '2': '病', '3': '科', '4': '换', '5': '亲',
+            '6': '胎', '7': '宅', '8': '产', '9': '神'
+        };
+
+        const TEN_NUM_MAP = {
+            '贵': 1, '分': 2, '升': 3, '动': 4, '散': 5,
+            '沉': 6, '稳': 7, '贱': 8, '虚': 9
+        };
+        const ONE_NUM_MAP = {
+            '官': 1, '病': 2, '科': 3, '换': 4, '亲': 5,
+            '胎': 6, '宅': 7, '产': 8, '神': 9
+        };
+
+        const COLOR_NUM_MAP = {
+            '#B8860B': 1, 'blue': 2, 'red': 3, 'black': 4
+        };
+
+        const COLOR_MAP = {
+            '官': {'子':'blue','丑':'red','寅':'black','卯':'black','辰':'red','巳':'blue','午':'blue','未':'red','申':'red','酉':'red','戌':'#B8860B','亥':'#B8860B'},
+            '病': {'子':'blue','丑':'red','寅':'black','卯':'black','辰':'red','巳':'blue','午':'blue','未':'red','申':'red','酉':'#B8860B','戌':'red','亥':'blue'},
+            '科': {'子':'black','丑':'blue','寅':'red','卯':'red','辰':'blue','巳':'red','午':'#B8860B','未':'blue','申':'blue','酉':'blue','戌':'blue','亥':'black'},
+            '换': {'子':'black','丑':'black','寅':'red','卯':'#B8860B','辰':'blue','巳':'blue','午':'blue','未':'black','申':'blue','酉':'blue','戌':'black','亥':'red'},
+            '亲': {'子':'red','丑':'black','寅':'red','卯':'red','辰':'red','巳':'#B8860B','午':'blue','未':'black','申':'black','酉':'blue','戌':'black','亥':'red'},
+            '胎': {'子':'#B8860B','丑':'blue','寅':'blue','卯':'black','辰':'blue','巳':'black','午':'black','未':'blue','申':'red','酉':'red','戌':'blue','亥':'red'},
+            '宅': {'子':'blue','丑':'#B8860B','寅':'red','卯':'blue','辰':'red','巳':'red','午':'red','未':'red','申':'blue','酉':'blue','戌':'blue','亥':'black'},
+            '产': {'子':'black','丑':'blue','寅':'blue','卯':'blue','辰':'red','巳':'red','午':'red','未':'#B8860B','申':'#B8860B','酉':'blue','戌':'red','亥':'black'},
+            '神': {'子':'blue','丑':'red','寅':'blue','卯':'blue','辰':'red','巳':'blue','午':'blue','未':'red','申':'red','酉':'red','戌':'red','亥':'blue'}
+        };
+
+        // 从 localStorage 加载已导入的条文
+        const STORAGE_KEY = 'suian_entries_v1';
+        const importedEntries = new Map();
+
+        function loadFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const obj = JSON.parse(raw);
+                    Object.keys(obj).forEach(k => importedEntries.set(k, obj[k]));
+                }
+            } catch (e) { console.warn('读取本地条文失败', e); }
+        }
+
+        function saveToStorage() {
+            try {
+                const obj = {};
+                importedEntries.forEach((v, k) => { obj[k] = v; });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+            } catch (e) { console.warn('保存条文失败', e); }
+        }
+
+        let calendarBaseYear = null;
+        let divinationActive = false;
+
+        const selectors = {
+            yearGan: document.getElementById('yearGan'),
+            yearZhi: document.getElementById('yearZhi'),
+            monthGan: document.getElementById('monthGan'),
+            monthZhi: document.getElementById('monthZhi'),
+            dayGan: document.getElementById('dayGan'),
+            dayZhi: document.getElementById('dayZhi'),
+            hourGan: document.getElementById('hourGan'),
+            hourZhi: document.getElementById('hourZhi'),
+        };
+
+        const surnameInput = document.getElementById('surnameStroke');
+        const middleInput = document.getElementById('middleStroke');
+        const lastInput = document.getElementById('lastStroke');
+        const computedStrokeDisplay = document.getElementById('computedStrokeDisplay');
+
+        const calcBtn = document.getElementById('calcBtn');
+        const divineBtn = document.getElementById('divineBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyStatus = document.getElementById('copyStatus');
+        const dataStatus = document.getElementById('dataStatus');
+        const randomBtn = document.getElementById('randomBtn');
+        const wnlBtn = document.getElementById('wnlBtn');
+        const importBtn = document.getElementById('importBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        const resultArea = document.getElementById('resultArea');
+        const jiangtianDisplay = document.getElementById('jiangtianDisplay');
+        const age1Display = document.getElementById('age1Display');
+        const divinationDisplay = document.getElementById('divinationDisplay');
+        const divMainCombo = document.getElementById('divMainCombo');
+        const divMainNum = document.getElementById('divMainNum');
+        const divMainVerse = document.getElementById('divMainVerse');
+        const divDerivContainer = document.getElementById('divDerivContainer');
+        const ageGrid = document.getElementById('ageGrid');
+        const computedBaziDisplay = document.getElementById('computedBaziDisplay');
+        const tabsRow = document.getElementById('tabsRow');
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = {
+            tabList: document.getElementById('tabList'),
+            tabQuery: document.getElementById('tabQuery'),
+            tabRange: document.getElementById('tabRange'),
+        };
+
+        const queryAge = document.getElementById('queryAge');
+        const queryBtn = document.getElementById('queryBtn');
+        const queryResult = document.getElementById('queryResult');
+
+        const rangeStart = document.getElementById('rangeStart');
+        const rangeEnd = document.getElementById('rangeEnd');
+        const rangeBtn = document.getElementById('rangeBtn');
+        const rangeGrid = document.getElementById('rangeGrid');
+
+        let currentJiangtian = null;
+        let currentYearZhi = null;
+
+        function updateDataStatus() {
+            const n = importedEntries.size;
+            if (n === 0) {
+                dataStatus.textContent = '尚未导入命书条文（点击“导入命书”按钮）';
+                dataStatus.style.color = '#8a2a2a';
+            } else {
+                dataStatus.textContent = `已加载 ${n} 条命书条文`;
+                dataStatus.style.color = '#2a5a3a';
+            }
+        }
+
+        function getZhiForAge(yearZhi, age) {
+            const idx = (yearZhi - 1 + age - 1) % 12;
+            return ZHI_CHARS[idx];
+        }
+
+        function getYearLabel(age, yearZhi) {
+            const zhi = getZhiForAge(yearZhi, age);
+            if (calendarBaseYear) {
+                const gy = calendarBaseYear + age - 1;
+                return `${age}岁${gy}${zhi}`;
+            }
+            return `${age}岁${zhi}`;
+        }
+
+        function computeStroke() {
+            const s = parseInt(surnameInput.value.trim(), 10);
+            const m = parseInt(middleInput.value.trim(), 10);
+            const l = parseInt(lastInput.value.trim(), 10);
+            if (isNaN(s) || isNaN(m) || isNaN(l)) return null;
+            return s * 100 + m * 10 + l;
+        }
+
+        function updateStrokeDisplay() {
+            const stroke = computeStroke();
+            computedStrokeDisplay.textContent = (stroke !== null && stroke >= 0) ? stroke : '?';
+            return stroke;
+        }
+
+        function splitAndReduceToText(num) {
+            if (num === undefined || num === null || isNaN(num)) return '';
+            const str = String(num);
+            if (str.length < 2) return str;
+
+            const len = str.length;
+            const firstLen = Math.ceil(len / 2);
+            const firstPart = str.substring(0, firstLen);
+            const secondPart = str.substring(firstLen);
+
+            function digitRoot(s) {
+                if (s.length === 0) return 0;
+                let sum = 0;
+                for (let ch of s) sum += parseInt(ch, 10);
+                while (sum >= 10) {
+                    let t = 0;
+                    while (sum > 0) { t += sum % 10; sum = Math.floor(sum / 10); }
+                    sum = t;
+                }
+                return sum;
+            }
+
+            const root1 = digitRoot(firstPart);
+            const root2 = digitRoot(secondPart);
+            return (TEN_MAP[String(root1)] || String(root1)) + (ONE_MAP[String(root2)] || String(root2));
+        }
+
+        function getColoredText(text, zhi) {
+            if (!text || text.length < 2) return text;
+            const ten = text[0];
+            const one = text[1];
+            const color = COLOR_MAP[one] ? COLOR_MAP[one][zhi] : null;
+            if (color) return `<span>${ten}</span><span style="color:${color};">${one}</span>`;
+            return `<span>${ten}</span><span>${one}</span>`;
+        }
+
+        function getComboInfo(comboText, zhi, gongNum) {
+            const f = comboText[0];
+            const s = comboText[1];
+            const color = COLOR_MAP[s] ? COLOR_MAP[s][zhi] : null;
+            const colorNum = color ? (COLOR_NUM_MAP[color] || 1) : 1;
+            const tenNum = TEN_NUM_MAP[f] || 1;
+            const oneNum = ONE_NUM_MAP[s] || 1;
+            const concatNum = colorNum * 1000 + tenNum * 100 + oneNum * 10 + gongNum;
+            const result = 10409 + concatNum;
+            const coloredText = color
+                ? `<span>${f}</span><span style="color:${color};">${s}</span>`
+                : `<span>${f}</span><span>${s}</span>`;
+            return { text: comboText, coloredText, result, key: String(result) };
+        }
+
+        function getVerse(key) {
+            return importedEntries.get(key) || '';
+        }
+
+        function getNinePalaceNumbers(jiangtian, age, yearZhi) {
+            const raw = jiangtian * age;
+            const text = splitAndReduceToText(raw);
+            const zhi = getZhiForAge(yearZhi, age);
+            const firstSeq = ['贵','分','升','动','散','沉','稳','贱','虚'];
+            const secondSeq = ['官','病','科','换','亲','胎','宅','产','神'];
+            const fi = firstSeq.indexOf(text[0]);
+            const si = secondSeq.indexOf(text[1]);
+            const arr = [];
+            for (let i = 0; i < 9; i++) {
+                const fc = firstSeq[(fi + i) % 9];
+                const sc = secondSeq[(si + i) % 9];
+                const info = getComboInfo(fc + sc, zhi, i + 1);
+                arr.push({ combo: fc + sc, result: info.result, key: info.key, verse: getVerse(info.key) });
+            }
+            return arr;
+        }
+
+        function generateDerivativesHTML(comboText, zhi) {
+            const firstSeq = ['贵','分','升','动','散','沉','稳','贱','虚'];
+            const secondSeq = ['官','病','科','换','亲','胎','宅','产','神'];
+            if (comboText.length < 2) return '';
+            const fi = firstSeq.indexOf(comboText[0]);
+            const si = secondSeq.indexOf(comboText[1]);
+            if (fi === -1 || si === -1) return '';
+            let html = '';
+            for (let i = 0; i < 9; i++) {
+                const fc = firstSeq[(fi + i) % 9];
+                const sc = secondSeq[(si + i) % 9];
+                const info = getComboInfo(fc + sc, zhi, i + 1);
+                const verse = getVerse(info.key);
+                html += `<div class="deriv-line">
+                    <div><span class="deriv-combo">${info.coloredText}</span> <span class="deriv-num">${info.result}</span></div>
+                    ${verse ? `<div class="verse-inline">${verse}</div>` : ''}
+                </div>`;
+            }
+            return html;
+        }
+
+        function populateSelects() {
+            const ganSelects = [selectors.yearGan, selectors.monthGan, selectors.dayGan, selectors.hourGan];
+            const zhiSelects = [selectors.yearZhi, selectors.monthZhi, selectors.dayZhi, selectors.hourZhi];
+
+            ganSelects.forEach(sel => {
+                sel.innerHTML = '';
+                GAN_LIST.forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = GAN_MAP[g]; opt.textContent = g;
+                    sel.appendChild(opt);
+                });
+            });
+            zhiSelects.forEach(sel => {
+                sel.innerHTML = '';
+                ZHI_LIST.forEach(z => {
+                    const opt = document.createElement('option');
+                    opt.value = ZHI_MAP[z]; opt.textContent = z;
+                    sel.appendChild(opt);
+                });
+            });
+        }
+
+        function initCalendarSelectors() {
+            const now = new Date();
+            const ySel = document.getElementById('wnl_year');
+            const mSel = document.getElementById('wnl_month');
+            const dSel = document.getElementById('wnl_day');
+            const hSel = document.getElementById('wnl_hour');
+
+            for (let y = 1900; y <= 2100; y++) {
+                const opt = document.createElement('option');
+                opt.value = y; opt.textContent = y;
+                if (y === now.getFullYear()) opt.selected = true;
+                ySel.appendChild(opt);
+            }
+            for (let m = 1; m <= 12; m++) {
+                const opt = document.createElement('option');
+                opt.value = m; opt.textContent = m;
+                if (m === now.getMonth() + 1) opt.selected = true;
+                mSel.appendChild(opt);
+            }
+            for (let d = 1; d <= 31; d++) {
+                const opt = document.createElement('option');
+                opt.value = d; opt.textContent = d;
+                if (d === now.getDate()) opt.selected = true;
+                dSel.appendChild(opt);
+            }
+            const hourList = [
+                {l:"23-01子",v:23},{l:"01-03丑",v:1},{l:"03-05寅",v:3},
+                {l:"05-07卯",v:5},{l:"07-09辰",v:7},{l:"09-11巳",v:9},
+                {l:"11-13午",v:11},{l:"13-15未",v:13},{l:"15-17申",v:15},
+                {l:"17-19酉",v:17},{l:"19-21戌",v:19},{l:"21-23亥",v:21}
+            ];
+            let defH = 23;
+            const ch = now.getHours();
+            for (const item of hourList) {
+                if (item.v === 23) { if (ch >= 23 || ch < 1) defH = 23; }
+                else if (ch >= item.v && ch < item.v + 2) { defH = item.v; break; }
+            }
+            hourList.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.v; opt.textContent = item.l;
+                if (item.v === defH) opt.selected = true;
+                hSel.appendChild(opt);
+            });
+        }
+
+        function applyPillars(pillars) {
+            const map = [
+                {gan: selectors.yearGan, zhi: selectors.yearZhi},
+                {gan: selectors.monthGan, zhi: selectors.monthZhi},
+                {gan: selectors.dayGan, zhi: selectors.dayZhi},
+                {gan: selectors.hourGan, zhi: selectors.hourZhi}
+            ];
+            pillars.forEach((p, i) => {
+                const g = p[0], z = p[1];
+                if (GAN_MAP[g] !== undefined) map[i].gan.value = GAN_MAP[g];
+                if (ZHI_MAP[z] !== undefined) map[i].zhi.value = ZHI_MAP[z];
+            });
+            updateBaziDisplay();
+        }
+
+        function computeBaziFromPillars() {
+            const yG = parseInt(selectors.yearGan.value, 10);
+            const yZ = parseInt(selectors.yearZhi.value, 10);
+            const mG = parseInt(selectors.monthGan.value, 10);
+            const mZ = parseInt(selectors.monthZhi.value, 10);
+            const dG = parseInt(selectors.dayGan.value, 10);
+            const dZ = parseInt(selectors.dayZhi.value, 10);
+            const hG = parseInt(selectors.hourGan.value, 10);
+            const hZ = parseInt(selectors.hourZhi.value, 10);
+            if ([yG,yZ,mG,mZ,dG,dZ,hG,hZ].some(isNaN)) return null;
+            return (yG + yZ) * 1000 + (mG + mZ) * 100 + (dG + dZ) * 10 + (hG + hZ);
+        }
+
+        function updateBaziDisplay() {
+            const bazi = computeBaziFromPillars();
+            computedBaziDisplay.textContent = bazi !== null ? bazi : '?';
+            return bazi;
+        }
+
+        function calcJiangtian(bazi, strokes) {
+            if (bazi === null || strokes === null) return null;
+            let jt = bazi + strokes * 2;
+            if (jt % 100 === 0) jt += 12;
+            return jt;
+        }
+
+        function showTabs() {
+            tabsRow.classList.remove('hidden');
+            Object.keys(tabContents).forEach(key => {
+                tabContents[key].classList.remove('hidden');
+            });
+            const activeTabBtn = document.querySelector('.tab-btn.active');
+            if (activeTabBtn) {
+                const tabId = activeTabBtn.dataset.tab;
+                Object.keys(tabContents).forEach(key => {
+                    tabContents[key].classList.toggle('active', key === tabId);
+                });
+            }
+            divinationActive = false;
+        }
+
+        function hideTabs() {
+            tabsRow.classList.add('hidden');
+            Object.keys(tabContents).forEach(key => {
+                tabContents[key].classList.add('hidden');
+            });
+            divinationActive = true;
+        }
+
+        function renderAll(jiangtian, yearZhi) {
+            if (jiangtian === null) { resultArea.classList.remove('active'); return; }
+            resultArea.classList.add('active');
+
+            jiangtianDisplay.textContent = jiangtian;
+
+            const raw1 = jiangtian;
+            const text1 = splitAndReduceToText(raw1);
+            const zhi1 = getZhiForAge(yearZhi, 1);
+            const info1 = getComboInfo(text1, zhi1, 1);
+            const verse1 = getVerse(info1.key);
+            age1Display.innerHTML = `${getYearLabel(1, yearZhi)} = ${info1.coloredText} <span style="font-weight:700;">${info1.result}</span>`
+                + (verse1 ? `<div class="verse">${verse1}</div>` : '');
+            age1Display.style.display = '';
+
+            divinationDisplay.style.display = 'none';
+            divMainCombo.innerHTML = '';
+            divMainNum.textContent = '';
+            divMainVerse.textContent = '';
+            divDerivContainer.innerHTML = '';
+            divDerivContainer.classList.remove('open');
+
+            showTabs();
+
+            renderAgeList(jiangtian, yearZhi);
+
+            queryResult.innerHTML = `<span class="empty">输入年龄，点击查询</span>`;
+            rangeGrid.innerHTML = '';
+
+            if (!queryAge.value.trim() || parseInt(queryAge.value, 10) < 1) queryAge.value = '36';
+            if (!rangeStart.value.trim() || parseInt(rangeStart.value, 10) < 1) rangeStart.value = '1';
+            if (!rangeEnd.value.trim() || parseInt(rangeEnd.value, 10) < 1) rangeEnd.value = '20';
+        }
+
+        function renderAgeList(jiangtian, yearZhi) {
+            let html = '';
+            for (let age = 1; age <= 100; age++) {
+                const raw = jiangtian * age;
+                const text = splitAndReduceToText(raw);
+                const zhi = getZhiForAge(yearZhi, age);
+                const info = getComboInfo(text, zhi, 1);
+                const verse = getVerse(info.key);
+                const ageLabel = getYearLabel(age, yearZhi);
+                html += `
+                    <div class="age-item" data-age="${age}" data-zhi="${zhi}" data-combo="${text}">
+                        <div class="age-header">
+                            <span class="age-num">${ageLabel}</span>
+                            <span><span class="age-val">${info.coloredText}</span><span class="age-num-result">${info.result}</span></span>
+                        </div>
+                        ${verse ? `<div class="verse">${verse}</div>` : ''}
+                        <div class="derivatives-container"></div>
+                    </div>
+                `;
+            }
+            ageGrid.innerHTML = html;
+        }
+
+        ageGrid.addEventListener('click', function(e) {
+            const item = e.target.closest('.age-item');
+            if (!item) return;
+            const container = item.querySelector('.derivatives-container');
+            if (!container) return;
+            if (container.children.length === 0) {
+                const zhi = item.dataset.zhi;
+                const combo = item.dataset.combo;
+                if (combo && combo.length === 2) {
+                    container.innerHTML = generateDerivativesHTML(combo, zhi);
+                }
+            }
+            container.classList.toggle('open');
+        });
+
+        function renderQueryResult(jiangtian, age, yearZhi) {
+            if (jiangtian === null || age === null || age < 1) {
+                queryResult.innerHTML = `<span class="empty">请输入有效的年龄（≥1）</span>`;
+                return;
+            }
+            const raw = jiangtian * age;
+            const text = splitAndReduceToText(raw);
+            const zhi = getZhiForAge(yearZhi, age);
+            const info = getComboInfo(text, zhi, 1);
+            const verse = getVerse(info.key);
+            queryResult.innerHTML = `
+                <div>
+                    <span>${getYearLabel(age, yearZhi)}  →</span>
+                    <span class="highlight">${info.coloredText} ${info.result}</span>
+                </div>
+                ${verse ? `<div class="verse" style="font-size:14px;">${verse}</div>` : ''}
+            `;
+        }
+
+        function renderRangeResult(jiangtian, start, end, yearZhi) {
+            if (jiangtian === null || start === null || end === null || start < 1 || end < 1 || start > end) {
+                rangeGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#666;padding:20px;">请输入有效的年龄范围</div>`;
+                return;
+            }
+            const maxDisplay = 500;
+            let count = 0, html = '';
+            for (let age = start; age <= end; age++) {
+                if (count >= maxDisplay) {
+                    html += `<div class="age-item" style="grid-column:1/-1;text-align:center;color:#666;">… 仅显示前 ${maxDisplay} 项 …</div>`;
+                    break;
+                }
+                const raw = jiangtian * age;
+                const text = splitAndReduceToText(raw);
+                const zhi = getZhiForAge(yearZhi, age);
+                const info = getComboInfo(text, zhi, 1);
+                const verse = getVerse(info.key);
+                html += `
+                    <div class="age-item" style="flex-direction:column;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+                            <span class="age-num">${getYearLabel(age, yearZhi)}</span>
+                            <span><span class="age-val">${info.coloredText}</span><span class="age-num-result">${info.result}</span></span>
+                        </div>
+                        ${verse ? `<div class="verse">${verse}</div>` : ''}
+                    </div>
+                `;
+                count++;
+            }
+            rangeGrid.innerHTML = html;
+        }
+
+        function performDivination() {
+            if (currentJiangtian === null) { alert('请先点击「推演」计算江天数'); return; }
+            const dayZhiNum = parseInt(selectors.dayZhi.value, 10);
+            if (isNaN(dayZhiNum) || dayZhiNum < 1 || dayZhiNum > 12) { alert('日支选择无效'); return; }
+            const dayZhiChar = ZHI_CHARS[dayZhiNum - 1];
+
+            const raw1 = currentJiangtian;
+            const text1 = splitAndReduceToText(raw1);
+            const info = getComboInfo(text1, dayZhiChar, 1);
+            const verse = getVerse(info.key);
+
+            age1Display.style.display = 'none';
+            divinationDisplay.style.display = 'block';
+
+            divMainCombo.innerHTML = info.coloredText;
+            divMainNum.textContent = info.result;
+            divMainVerse.textContent = verse || '';
+
+            divDerivContainer.innerHTML = '';
+            divDerivContainer.classList.remove('open');
+
+            divinationDisplay.dataset.combo = text1;
+            divinationDisplay.dataset.zhi = dayZhiChar;
+
+            hideTabs();
+        }
+
+        divinationDisplay.addEventListener('click', function(e) {
+            const container = divDerivContainer;
+            const combo = this.dataset.combo;
+            const zhi = this.dataset.zhi;
+            if (!combo || combo.length < 2) return;
+            if (container.children.length === 0) {
+                container.innerHTML = generateDerivativesHTML(combo, zhi);
+            }
+            container.classList.toggle('open');
+        });
+
+        function performCalculation() {
+            const bazi = computeBaziFromPillars();
+            if (bazi === null) { alert('请完整选择四柱的天干地支'); return; }
+            const strokes = computeStroke();
+            if (strokes === null || strokes < 0) { alert('请输入有效的姓名笔画数字'); return; }
+            const yearZhi = parseInt(selectors.yearZhi.value, 10);
+            if (isNaN(yearZhi) || yearZhi < 1 || yearZhi > 12) { alert('年支选择无效'); return; }
+
+            const jiangtian = calcJiangtian(bazi, strokes);
+            currentJiangtian = jiangtian;
+            currentYearZhi = yearZhi;
+
+            renderAll(jiangtian, yearZhi);
+
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const tabId = activeTab.dataset.tab;
+                if (tabId === 'tabQuery') {
+                    const age = parseInt(queryAge.value.trim(), 10);
+                    renderQueryResult(jiangtian, isNaN(age) ? null : age, yearZhi);
+                } else if (tabId === 'tabRange') {
+                    const start = parseInt(rangeStart.value.trim(), 10);
+                    const end = parseInt(rangeEnd.value.trim(), 10);
+                    renderRangeResult(jiangtian, isNaN(start) ? null : start, isNaN(end) ? null : end, yearZhi);
+                }
+            }
+        }
+
+        function generateBook() {
+            if (currentJiangtian === null || currentYearZhi === null) return '';
+            const pillars = [
+                GAN_LIST[parseInt(selectors.yearGan.value, 10) - 1] + ZHI_CHARS[parseInt(selectors.yearZhi.value, 10) - 1],
+                GAN_LIST[parseInt(selectors.monthGan.value, 10) - 1] + ZHI_CHARS[parseInt(selectors.monthZhi.value, 10) - 1],
+                GAN_LIST[parseInt(selectors.dayGan.value, 10) - 1] + ZHI_CHARS[parseInt(selectors.dayZhi.value, 10) - 1],
+                GAN_LIST[parseInt(selectors.hourGan.value, 10) - 1] + ZHI_CHARS[parseInt(selectors.hourZhi.value, 10) - 1]
+            ];
+            const bazi = computeBaziFromPillars();
+            const strokes = computeStroke();
+
+            let text = '神机妙算随安数命书\n';
+            text += '============\n';
+            text += '八字：' + pillars.join(' ') + '\n';
+            text += '八字数：' + bazi + '\n';
+            text += '姓名笔画：' + strokes + '\n';
+            text += '江天数：' + currentJiangtian + '\n';
+            if (calendarBaseYear) {
+                text += '公历年份：' + calendarBaseYear + '年\n';
+            }
+            text += '\n';
+
+            if (divinationActive && divinationDisplay.style.display === 'block' && divinationDisplay.dataset.combo) {
+                text += '【占卜】\n';
+                const combo = divinationDisplay.dataset.combo;
+                const dayZhi = divinationDisplay.dataset.zhi;
+                const info = getComboInfo(combo, dayZhi, 1);
+                const verse = getVerse(info.key);
+                text += `本命 ${combo} ${info.result}`;
+                if (verse) text += ` ${verse}`;
+                text += '\n';
+                const firstSeq = ['贵','分','升','动','散','沉','稳','贱','虚'];
+                const secondSeq = ['官','病','科','换','亲','胎','宅','产','神'];
+                const fi = firstSeq.indexOf(combo[0]);
+                const si = secondSeq.indexOf(combo[1]);
+                for (let i = 0; i < 9; i++) {
+                    const fc = firstSeq[(fi + i) % 9];
+                    const sc = secondSeq[(si + i) % 9];
+                    const gi = getComboInfo(fc + sc, dayZhi, i + 1);
+                    text += `  ${i + 1}宫 ${fc + sc} ${gi.result}`;
+                    const v = getVerse(gi.key);
+                    if (v) text += ` ${v}`;
+                    text += '\n';
+                }
+                return text;
+            }
+
+            text += '【百岁九宫】\n';
+            const hasVerses = importedEntries.size > 0;
+
+            for (let age = 1; age <= 100; age++) {
+                const zhi = getZhiForAge(currentYearZhi, age);
+                const nums = getNinePalaceNumbers(currentJiangtian, age, zhi);
+                text += `${getYearLabel(age, currentYearZhi)}：\n`;
+                nums.forEach((item, idx) => {
+                    text += `  ${idx + 1}宫 ${item.combo} ${item.result}`;
+                    if (hasVerses && item.verse) text += ` ${item.verse}`;
+                    text += '\n';
+                });
+            }
+
+            return text;
+        }
+
+        copyBtn.addEventListener('click', function() {
+            const book = generateBook();
+            if (!book) { copyStatus.textContent = '请先推演'; setTimeout(() => copyStatus.textContent = '', 2000); return; }
+            const done = () => {
+                copyStatus.textContent = divinationActive ? '占卜命书已复制' : '命书已复制到剪贴板';
+                setTimeout(() => copyStatus.textContent = '', 2500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(book).then(done).catch(() => { fallbackCopy(book); done(); });
+            } else { fallbackCopy(book); done(); }
+        });
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch(e) {}
+            document.body.removeChild(ta);
+        }
+
+        randomBtn.addEventListener('click', function() {
+            const rand = () => Math.floor(Math.random() * 31);
+            surnameInput.value = rand();
+            middleInput.value = rand();
+            lastInput.value = rand();
+            updateStrokeDisplay();
+        });
+
+        wnlBtn.addEventListener('click', function() {
+            const y = parseInt(document.getElementById('wnl_year').value, 10);
+            const m = parseInt(document.getElementById('wnl_month').value, 10);
+            const d = parseInt(document.getElementById('wnl_day').value, 10);
+            const h = parseInt(document.getElementById('wnl_hour').value, 10);
+            const pillars = WNL.getFourPillar(y, m, d, h);
+            calendarBaseYear = y;
+            applyPillars(pillars);
+        });
+
+        importBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        clearBtn.addEventListener('click', function() {
+            if (importedEntries.size === 0) {
+                copyStatus.textContent = '当前没有条文可清空';
+                setTimeout(() => copyStatus.textContent = '', 2000);
+                return;
+            }
+            if (confirm('确定要清空已导入的所有条文吗？')) {
+                importedEntries.clear();
+                saveToStorage();
+                updateDataStatus();
+                copyStatus.textContent = '已清空条文';
+                setTimeout(() => copyStatus.textContent = '', 2000);
+                if (currentJiangtian !== null && currentYearZhi !== null) {
+                    performCalculation();
+                }
+            }
+        });
+
+        // 解析文本并提取 5位数字:条文 对
+        function parseEntries(text) {
+            const entries = new Map();
+            if (!text) return entries;
+
+            // 统一换行
+            let normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+            // 将"数字：条文"的换行形式统一处理，把"数字："后面的正文合并
+            // 例如 "11520：aaa\nbbb\n11521：ccc" 变成 "11520：aaa bbb \n11521：ccc"
+            // 我们使用全局正则匹配 5位数字 + 冒号 + 直到下一个 5位数字+冒号 或 末尾
+            const regex = /(\d{5})\s*[：:]\s*([\s\S]*?)(?=\n?\s*\d{5}\s*[：:]|$)/g;
+
+            let match;
+            let count = 0;
+            while ((match = regex.exec(normalized)) !== null) {
+                const key = match[1];
+                let body = match[2]
+                    .replace(/\n+/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                // 去掉首尾多余标点
+                body = body.replace(/^[。，、；：""''《》【】\[\]()（）\s]+/, '')
+                           .replace(/[。，、；：""''《》【】\[\]()（）\s]+$/, '');
+                // 过滤空白/纯圆圈/纯点占位
+                if (body.length > 0 && !/^[○O○\s。，、]+$/.test(body)) {
+                    entries.set(key, body);
+                    count++;
+                }
+            }
+            return { entries, count };
+        }
+
+        fileInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            copyStatus.textContent = '正在解析命书文件...';
+
+            try {
+                let text = '';
+                if (file.name.toLowerCase().endsWith('.docx')) {
+                    if (typeof mammoth === 'undefined') {
+                        copyStatus.textContent = 'docx解析库未加载，请检查网络';
+                        setTimeout(() => copyStatus.textContent = '', 4000);
+                        return;
+                    }
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    text = result.value;
+                } else {
+                    text = await file.text();
+                }
+
+                const { entries, count } = parseEntries(text);
+
+                // 合并（若同一key已存在，用新的覆盖）
+                entries.forEach((v, k) => importedEntries.set(k, v));
+                saveToStorage();
+                updateDataStatus();
+
+                copyStatus.textContent = `解析完成，新增/更新 ${count} 条条文（共 ${importedEntries.size} 条）`;
+                setTimeout(() => copyStatus.textContent = '', 4000);
+
+                if (currentJiangtian !== null && currentYearZhi !== null) {
+                    performCalculation();
+                }
+            } catch (err) {
+                console.error(err);
+                copyStatus.textContent = '解析失败：' + (err.message || '未知错误');
+                setTimeout(() => copyStatus.textContent = '', 5000);
+            }
+
+            fileInput.value = '';
+        });
+
+        Object.values(selectors).forEach(sel => {
+            sel.addEventListener('change', updateBaziDisplay);
+        });
+
+        selectors.yearGan.addEventListener('change', function() { calendarBaseYear = null; });
+        selectors.yearZhi.addEventListener('change', function() { calendarBaseYear = null; });
+
+        [surnameInput, middleInput, lastInput].forEach(inp => {
+            inp.addEventListener('input', updateStrokeDisplay);
+        });
+
+        calcBtn.addEventListener('click', performCalculation);
+        divineBtn.addEventListener('click', performDivination);
+
+        document.querySelectorAll('.name-group input').forEach(inp => {
+            inp.addEventListener('keydown', e => { if (e.key === 'Enter') performCalculation(); });
+        });
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                Object.keys(tabContents).forEach(key => {
+                    tabContents[key].classList.toggle('active', key === tabId);
+                });
+                showTabs();
+                if (currentJiangtian !== null && currentYearZhi !== null) {
+                    age1Display.style.display = '';
+                    divinationDisplay.style.display = 'none';
+                    divMainCombo.innerHTML = '';
+                    divMainNum.textContent = '';
+                    divMainVerse.textContent = '';
+                    divDerivContainer.innerHTML = '';
+                    divDerivContainer.classList.remove('open');
+
+                    if (tabId === 'tabQuery') {
+                        const age = parseInt(queryAge.value.trim(), 10);
+                        renderQueryResult(currentJiangtian, isNaN(age) ? null : age, currentYearZhi);
+                    } else if (tabId === 'tabRange') {
+                        const start = parseInt(rangeStart.value.trim(), 10);
+                        const end = parseInt(rangeEnd.value.trim(), 10);
+                        renderRangeResult(currentJiangtian, isNaN(start) ? null : start, isNaN(end) ? null : end, currentYearZhi);
+                    }
+                }
+            });
+        });
+
+        queryBtn.addEventListener('click', function() {
+            if (currentJiangtian === null || currentYearZhi === null) { alert('请先点击「推演」计算'); return; }
+            const age = parseInt(queryAge.value.trim(), 10);
+            renderQueryResult(currentJiangtian, isNaN(age) ? null : age, currentYearZhi);
+        });
+        queryAge.addEventListener('keydown', e => { if (e.key === 'Enter') queryBtn.click(); });
+
+        rangeBtn.addEventListener('click', function() {
+            if (currentJiangtian === null || currentYearZhi === null) { alert('请先点击「推演」计算'); return; }
+            let start = parseInt(rangeStart.value.trim(), 10);
+            let end = parseInt(rangeEnd.value.trim(), 10);
+            if (isNaN(start)) start = 1;
+            if (isNaN(end)) end = 20;
+            if (start > end) { [start, end] = [end, start]; rangeStart.value = start; rangeEnd.value = end; }
+            renderRangeResult(currentJiangtian, start, end, currentYearZhi);
+        });
+        rangeStart.addEventListener('keydown', e => { if (e.key === 'Enter') rangeBtn.click(); });
+        rangeEnd.addEventListener('keydown', e => { if (e.key === 'Enter') rangeBtn.click(); });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            populateSelects();
+            initCalendarSelectors();
+            loadFromStorage();
+            updateDataStatus();
+
+            selectors.yearGan.value = '1';
+            selectors.yearZhi.value = '1';
+            selectors.monthGan.value = '3';
+            selectors.monthZhi.value = '3';
+            selectors.dayGan.value = '5';
+            selectors.dayZhi.value = '5';
+            selectors.hourGan.value = '7';
+            selectors.hourZhi.value = '7';
+
+            surnameInput.value = '7';
+            middleInput.value = '0';
+            lastInput.value = '5';
+
+            updateBaziDisplay();
+            updateStrokeDisplay();
+            performCalculation();
+        });
+
+    })();
+</script>
+
+</body>
+</html>
